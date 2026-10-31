@@ -46,6 +46,9 @@ constexpr uint8_t I2C_PIN_SCL = 22;
 // ---- PCF8574 (บอร์ดสีแดง) A0-A2 = 0 ทั้งหมด -> address 0x20  (ถ้าเป็นรุ่น PCF8574A ใช้ 0x38) ----
 constexpr uint8_t PCF8574_ADDR = 0x20;
 
+// ---- ADS1115 (ADC 16 บิต) ขา ADDR ต่อ GND -> 0x48 (VDD = 0x49, SDA = 0x4A, SCL = 0x4B) ใช้ I2C บัสเดียวกับ PCF8574 ----
+constexpr uint8_t ADS1115_ADDR = 0x48;
+
 // ---- microSD (ยังไม่ใช้ใน Lab นี้) ----
 constexpr uint8_t SD_PIN_CS = 5;
 constexpr uint8_t SD_PIN_MOSI = 23;

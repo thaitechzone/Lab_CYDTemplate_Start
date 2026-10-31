@@ -80,6 +80,14 @@ void ioToggleLed(int index);
 uint8_t ioSwitches();         // บิต 0-3 = SW0-SW3 (P4-P7)
 uint8_t ioRaw();              // ระดับขาจริง P7..P0 ที่อ่านล่าสุด
 
+// ---- ADS1115 ADC 16 บิต 4 ช่อง (hal_ads1115.cpp) อ่าน A0-A3 เทียบ GND ----
+bool adsBegin();              // เริ่มแปลงช่อง A0 (true = เจอชิป) ต้องเรียกหลัง ioBegin() (ใช้ Wire เดียวกัน)
+void adsPoll(uint32_t now);   // เดินเครื่องอ่านทีละช่อง ไม่บล็อก เรียกจาก loop() ให้ถี่ๆ
+bool adsPresent();
+int16_t adsRaw(int ch);
+float adsVolts(int ch);       // แรงดัน (V) ช่อง 0-3
+uint32_t adsSweeps();         // นับรอบที่อ่านครบ 4 ช่อง (ไว้หาอัตราสุ่มตัวอย่าง)
+
 // ---- เซนเซอร์แสง ----
 int ldrRaw();  // 0-4095 (ยิ่งสว่างยิ่งต่ำ)
 

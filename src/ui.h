@@ -25,6 +25,7 @@ void ui_init();
 
 // ---- แต่ละแท็บ (parent = หน้าของแท็บ, เลื่อนขึ้นลงได้) ----
 void ui_io_tab(lv_obj_t *tab);
+void ui_adc_tab(lv_obj_t *tab);
 void ui_display_tab(lv_obj_t *tab);
 void ui_touch_tab(lv_obj_t *tab);
 void ui_led_tab(lv_obj_t *tab);

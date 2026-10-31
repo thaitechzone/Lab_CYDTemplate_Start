@@ -123,7 +123,7 @@ void printHelp()
                      " d  display config  r  reset display config (also: hold BOOT 1 s)\n"
                      " t  toggle raw touch print\n"
                      " l  LED test R,G,B,W   s  sound test\n"
-                     " p  PCF8574 status"));
+                     " p  PCF8574 status   a  ADS1115 values"));
 }
 
 void serialCommands()
@@ -167,6 +167,11 @@ void serialCommands()
                 Serial.printf("[PCF] 0x%02X %s pins=0x%02X leds=0x%X switches=0x%X\n", cyd::PCF8574_ADDR, hal::ioPresent() ? "present" : "MISSING", hal::ioRaw(),
                               hal::ioLeds(), hal::ioSwitches());
                 break;
+            case 'a':
+                Serial.printf("[ADS] 0x%02X %s  A0=%.3fV A1=%.3fV A2=%.3fV A3=%.3fV (raw %d %d %d %d)\n", cyd::ADS1115_ADDR, hal::adsPresent() ? "present" : "MISSING",
+                              hal::adsVolts(0), hal::adsVolts(1), hal::adsVolts(2), hal::adsVolts(3), hal::adsRaw(0), hal::adsRaw(1), hal::adsRaw(2),
+                              hal::adsRaw(3));
+                break;
             case 's': hal::soundPlay(hal::Melody::Scale); Serial.println("[SOUND] scale C5-C6"); break;
             default: break;
         }
@@ -205,6 +210,7 @@ void setup()
     hal::displayBegin();  // จอ + ค่าแก้จอที่บันทึกไว้ + ไฟหลังจอ
     hal::touchBegin();    // โหลดค่า calibrate (ถ้ายังไม่มี หน้า calibrate จะขึ้นเองหลัง splash)
     hal::ioBegin();       // PCF8574 ที่ I2C (SDA 27 / SCL 22)
+    hal::adsBegin();      // ADS1115 บนบัส I2C เดียวกัน
 
     lvglBegin();
     ui_init();
@@ -215,7 +221,9 @@ void setup()
 void loop()
 {
     const uint32_t wait = lv_timer_handler();  // LVGL บอกเองว่าอีกกี่ ms ถึงมีงานถัดไป
+    hal::adsPoll(millis());                    // ADS1115 ไม่บล็อก: เรียกถี่ๆ ทั้งก่อนและหลังพัก (I2C ทำใน loop เดียวกับ PCF8574 จึงไม่ชนกัน)
     delay(constrain(wait, 1, 5));
+    hal::adsPoll(millis());
 
     const uint32_t now = millis();
     serialCommands();

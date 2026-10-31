@@ -41,6 +41,12 @@ constexpr uint32_t IO_POLL_MS = 15;         // อ่านสวิตช์ท
 constexpr uint8_t IO_DEBOUNCE_SAMPLES = 2;  // ค่าต้องนิ่งกี่ครั้งติดกันจึงนับว่าสวิตช์เปลี่ยน
 constexpr uint32_t IO_RETRY_MS = 1000;      // ชิปหาย: ลองต่อใหม่ทุกกี่ ms
 
+// ---- ADS1115 / แท็บ ADC ----
+constexpr uint32_t ADS_RETRY_MS = 1000;      // ชิปหาย: ลองต่อใหม่ทุกกี่ ms
+constexpr float ADC_FULLSCALE_V = 3.3f;      // แรงดันเต็มสเกลของเกจ/กราฟ (VDD ของวงจรวัด)
+constexpr float ADC_ALARM_V = 3.0f;          // เตือนด้วยเสียงเมื่อช่องที่เลือกสูงกว่านี้ (เปิด/ปิดบนจอ)
+constexpr uint32_t ADC_GRAPH_MS = 80;        // เพิ่มจุดกราฟทุกกี่ ms (150 จุด -> ย้อนหลัง 12 วินาที)
+
 // ---- ไฟหลังจอ (PWM ที่ GPIO21) ----
 constexpr uint32_t BL_PWM_FREQ_HZ = 5000;
 constexpr uint8_t BL_PWM_BITS = 8;
