@@ -5,12 +5,26 @@
 #include "ui.h"
 
 // =====================================================================
-//  แท็บ "ระบบ": ข้อมูลบอร์ด/หน่วยความจำ/เซนเซอร์แสง และคำสั่ง Serial
+//  แท็บ "ระบบ": รวมหน้าตั้งค่า/ทดสอบทั้งหมดไว้ที่เดียว สลับด้วยแถบด้านบน
+//    ข้อมูล (บอร์ด/หน่วยความจำ/Serial) | จอ | สัมผัส (calibrate) | RGB | เสียง | I/O (ทดสอบ PCF8574)
 // =====================================================================
 
 namespace {
 
 lv_obj_t *gLive;
+constexpr int SECTIONS = 6;
+lv_obj_t *gSec[SECTIONS];
+lv_obj_t *gSeg;
+int gCurrent = 0;
+
+void onSeg(lv_event_t *)
+{
+    const uint32_t id = lv_btnmatrix_get_selected_btn(gSeg);
+    if (id >= SECTIONS || static_cast<int>(id) == gCurrent) return;
+    ui_view_show(gSec[id], gSec[gCurrent], static_cast<int>(id) > gCurrent ? 1 : -1);
+    gCurrent = id;
+    hal::soundTone(700 + id * 60, 40);
+}
 
 void tick(lv_timer_t *)
 {
@@ -23,7 +37,7 @@ void tick(lv_timer_t *)
 
 }  // namespace
 
-void ui_system_tab(lv_obj_t *tab)
+static void buildInfo(lv_obj_t *tab)
 {
     lv_obj_t *card = ui_card(tab, "บอร์ด");
     esp_chip_info_t chip;
@@ -46,4 +60,32 @@ void ui_system_tab(lv_obj_t *tab)
 
     lv_timer_create(tick, 1000, nullptr);
     tick(nullptr);
+}
+
+void ui_system_tab(lv_obj_t *tab)
+{
+    static const char *segMap[] = {"ข้อมูล", "จอ", "สัมผัส", "RGB", "เสียง", "I/O", ""};
+    gSeg = lv_btnmatrix_create(tab);
+    lv_btnmatrix_set_map(gSeg, segMap);
+    lv_btnmatrix_set_btn_ctrl_all(gSeg, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_one_checked(gSeg, true);
+    lv_btnmatrix_set_btn_ctrl(gSeg, 0, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_obj_set_size(gSeg, LV_PCT(100), 38);
+    lv_obj_set_style_pad_all(gSeg, 3, 0);
+    lv_obj_set_style_pad_column(gSeg, 3, 0);
+    lv_obj_set_style_bg_color(gSeg, UI_COL_CARD, 0);
+    lv_obj_set_style_border_color(gSeg, UI_COL_BORDER, 0);
+    lv_obj_set_style_bg_color(gSeg, UI_COL_BORDER, LV_PART_ITEMS | LV_STATE_CHECKED);
+    lv_obj_set_style_text_color(gSeg, UI_COL_ACCENT, LV_PART_ITEMS | LV_STATE_CHECKED);
+    lv_obj_add_event_cb(gSeg, onSeg, LV_EVENT_VALUE_CHANGED, nullptr);
+    ui_no_scroll(gSeg);
+
+    for (lv_obj_t *&sec : gSec) sec = ui_section(tab);
+    buildInfo(gSec[0]);
+    ui_display_tab(gSec[1]);
+    ui_touch_tab(gSec[2]);
+    ui_led_tab(gSec[3]);
+    ui_sound_tab(gSec[4]);
+    ui_io_tab(gSec[5]);
+    for (int i = 1; i < SECTIONS; i++) lv_obj_add_flag(gSec[i], LV_OBJ_FLAG_HIDDEN);
 }

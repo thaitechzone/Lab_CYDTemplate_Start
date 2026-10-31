@@ -57,6 +57,7 @@
 #define LV_USE_BAR 1
 #define LV_USE_ARC 1
 #define LV_USE_LINE 1
+#define LV_USE_DROPDOWN 1  // เลือกเงื่อนไขในหน้าแก้กฎ
 #define LV_USE_METER 1  // เกจเข็ม (แท็บ ADC)
 #define LV_USE_CHART 1  // กราฟเส้น (แท็บ ADC)
 #define LV_USE_TABVIEW 1

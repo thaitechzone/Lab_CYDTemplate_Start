@@ -374,7 +374,7 @@ void ui_io_tab(lv_obj_t *tab)
         gSwCap[i] = ui_label(c, buf, nullptr, lv_palette_lighten(LV_PALETTE_GREY, 2));
         paintSw(i);
     }
-    gLinkSw = ui_switch_row(card, "กดสวิตช์ = สลับ LED", true, onLink);
+    gLinkSw = ui_switch_row(card, "กดสวิตช์ = สลับ LED", false, onLink);
 
     // ---- จอสัมผัส ----
     card = ui_card(tab, "จอสัมผัส");

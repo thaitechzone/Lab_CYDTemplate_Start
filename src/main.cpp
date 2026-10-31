@@ -17,6 +17,7 @@
 
 #include "app_config.h"
 #include "board_config.h"
+#include "farm.h"
 #include "hal.h"
 #include "ui.h"
 
@@ -211,6 +212,7 @@ void setup()
     hal::touchBegin();    // โหลดค่า calibrate (ถ้ายังไม่มี หน้า calibrate จะขึ้นเองหลัง splash)
     hal::ioBegin();       // PCF8574 ที่ I2C (SDA 27 / SCL 22)
     hal::adsBegin();      // ADS1115 บนบัส I2C เดียวกัน
+    farm::begin();        // กฎ Smart Farm (โหลดจาก NVS)
 
     lvglBegin();
     ui_init();
@@ -226,6 +228,7 @@ void loop()
     hal::adsPoll(millis());
 
     const uint32_t now = millis();
+    farm::tick(now);  // กฎอัตโนมัติทำงานทุกหน้าจอ
     serialCommands();
     bootButton(now);
 

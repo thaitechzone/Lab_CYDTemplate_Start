@@ -11,8 +11,8 @@
 
 namespace app {
 
-inline constexpr char APP_NAME[] = "Lab Template Start";
-inline constexpr char FW_VERSION[] = "v1.0.0";
+inline constexpr char APP_NAME[] = "Smart Farm Controller";
+inline constexpr char FW_VERSION[] = "v2.0.0";
 inline constexpr char NVS_NAMESPACE[] = "labstart";  // ชื่อที่เก็บค่าถาวร (เปลี่ยนชื่อ = ค่าเดิมหายทั้งหมด)
 
 constexpr uint32_t SERIAL_BAUD = 115200;   // ต้องตรงกับ monitor_speed ใน platformio.ini
@@ -46,6 +46,9 @@ constexpr uint32_t ADS_RETRY_MS = 1000;      // ชิปหาย: ลองต
 constexpr float ADC_FULLSCALE_V = 3.3f;      // แรงดันเต็มสเกลของเกจ/กราฟ (VDD ของวงจรวัด)
 constexpr float ADC_ALARM_V = 3.0f;          // เตือนด้วยเสียงเมื่อช่องที่เลือกสูงกว่านี้ (เปิด/ปิดบนจอ)
 constexpr uint32_t ADC_GRAPH_MS = 80;        // เพิ่มจุดกราฟทุกกี่ ms (150 จุด -> ย้อนหลัง 12 วินาที)
+
+// ---- กฎ Smart Farm ----
+constexpr float RULE_HYST_PCT = 3.0f;  // กันค่าแกว่งรอบเกณฑ์: เงื่อนไข ADC จะกลับเป็นเท็จเมื่อห่างจากเกณฑ์เกินค่านี้ (% ของเต็มสเกล)
 
 // ---- ไฟหลังจอ (PWM ที่ GPIO21) ----
 constexpr uint32_t BL_PWM_FREQ_HZ = 5000;

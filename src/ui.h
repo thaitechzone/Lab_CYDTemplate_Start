@@ -20,10 +20,20 @@ constexpr int UI_W = 320;
 constexpr int UI_H = 240;
 constexpr int UI_TAB_H = 34;  // ความสูงแถบแท็บด้านบน
 
+// ---- โทนสี Smart Green Technology ----
+#define UI_COL_BG lv_color_hex(0x08130D)      // พื้นหลังจอ
+#define UI_COL_CARD lv_color_hex(0x10241A)    // การ์ด
+#define UI_COL_TILE lv_color_hex(0x0C1D14)    // กล่องย่อยในการ์ด
+#define UI_COL_BORDER lv_color_hex(0x1F4A33)  // เส้นขอบ
+#define UI_COL_ACCENT lv_color_hex(0x6CF0A0)  // สีเน้น (เขียวมิ้นต์)
+#define UI_COL_DIM lv_color_hex(0x8FB3A0)     // ข้อความรอง
+
 // ---- สร้างทั้ง UI ----
 void ui_init();
 
 // ---- แต่ละแท็บ (parent = หน้าของแท็บ, เลื่อนขึ้นลงได้) ----
+void ui_farm_tab(lv_obj_t *tab);   // แดชบอร์ดสวน
+void ui_rules_tab(lv_obj_t *tab);  // กฎอัตโนมัติ
 void ui_io_tab(lv_obj_t *tab);
 void ui_adc_tab(lv_obj_t *tab);
 void ui_display_tab(lv_obj_t *tab);
@@ -54,3 +64,6 @@ lv_obj_t *ui_overlay();                                   // พื้นเต�
 lv_obj_t *ui_crosshair(lv_obj_t *parent, lv_color_t color);  // เป้ากากบาท 41x41 (วางด้วย ui_crosshair_move)
 void ui_crosshair_move(lv_obj_t *cross, int x, int y);    // ให้ "กลางเป้า" อยู่ที่ (x, y)
 void ui_no_scroll(lv_obj_t *obj);                         // ลากบน widget นี้ไม่ให้หน้าเลื่อนตาม
+void ui_ripple(lv_obj_t *parent);                         // คลื่นวงกลมขยายจากกลาง parent แล้วจางหาย (ถูกตัดตามขอบ parent)
+lv_obj_t *ui_section(lv_obj_t *parent);                   // กล่องโปร่งใสเรียงลูกแนวตั้ง ไว้ใส่เนื้อหาของแต่ละหัวข้อ
+void ui_view_show(lv_obj_t *show, lv_obj_t *hide, int dir);  // สลับหัวข้อ: hide ซ่อน, show สไลด์+จางเข้ามา (dir -1 = จากซ้าย, 1 = จากขวา)

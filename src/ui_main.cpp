@@ -9,6 +9,23 @@
 namespace {
 
 lv_obj_t *gTabview = nullptr;
+int gSlideDir = 1;
+
+void viewExec(void *var, int32_t v)
+{
+    lv_obj_t *o = static_cast<lv_obj_t *>(var);
+    lv_obj_set_style_opa(o, v * 255 / 100, 0);
+    lv_obj_set_style_translate_x(o, gSlideDir * (100 - v) * 36 / 100, 0);
+}
+
+void rippleExec(void *var, int32_t v)
+{
+    lv_obj_t *r = static_cast<lv_obj_t *>(var);
+    const int s = 10 + v * 80 / 100;
+    lv_obj_set_size(r, s, s);
+    lv_obj_center(r);
+    lv_obj_set_style_bg_opa(r, (100 - v) * 150 / 100, 0);
+}
 
 void splashDone(lv_timer_t *t)
 {
@@ -21,12 +38,12 @@ void splashDone(lv_timer_t *t)
 void showSplash()
 {
     lv_obj_t *s = ui_overlay();
-    lv_obj_set_style_bg_color(s, lv_color_hex(0x0B1A2E), 0);
+    lv_obj_set_style_bg_color(s, UI_COL_BG, 0);
     lv_obj_set_flex_flow(s, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(s, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    ui_label(s, "ESP32 CYD Dev Level 2", &font_th_24, lv_palette_main(LV_PALETTE_CYAN));
+    ui_label(s, "SMART FARM", &font_th_24, UI_COL_ACCENT);
     ui_label(s, app::APP_NAME);
-    ui_label(s, "ตรวจจอ | จอสัมผัส | ไฟ RGB | เสียง", nullptr, lv_palette_lighten(LV_PALETTE_GREY, 2));
+    ui_label(s, "เซนเซอร์ | กฎอัตโนมัติ | ควบคุมอุปกรณ์", nullptr, UI_COL_DIM);
     char buf[48];
     snprintf(buf, sizeof(buf), "%s  |  จอ %s", app::FW_VERSION, hal::displayDriverName());
     ui_label(s, buf, nullptr, lv_palette_main(LV_PALETTE_GREY));
@@ -38,24 +55,32 @@ void showSplash()
 void ui_init()
 {
     lv_disp_t *disp = lv_disp_get_default();
-    lv_theme_t *th = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_CYAN), true, &font_th_16);
+    lv_theme_t *th = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_GREEN), lv_palette_main(LV_PALETTE_LIGHT_GREEN), true, &font_th_16);
     lv_disp_set_theme(disp, th);
 
+    lv_obj_set_style_bg_color(lv_scr_act(), UI_COL_BG, 0);
     gTabview = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, UI_TAB_H);
+    lv_obj_set_style_bg_color(gTabview, UI_COL_BG, 0);
     // ปิดการปัดซ้าย-ขวาเพื่อเปลี่ยนแท็บ: ลากแถบเลื่อน/วาดเส้นจะได้ไม่เปลี่ยนแท็บโดยไม่ตั้งใจ (กดที่ชื่อแท็บแทน)
     lv_obj_clear_flag(lv_tabview_get_content(gTabview), LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t *tabBtns = lv_tabview_get_tab_btns(gTabview);
     lv_obj_set_style_text_font(tabBtns, &font_th_16, 0);
     lv_obj_set_style_pad_all(tabBtns, 0, 0);
+    lv_obj_set_style_bg_color(tabBtns, UI_COL_CARD, 0);
+    lv_obj_set_style_text_color(tabBtns, UI_COL_DIM, 0);
+    lv_obj_set_style_text_color(tabBtns, UI_COL_ACCENT, LV_PART_ITEMS | LV_STATE_CHECKED);
+    lv_obj_set_style_border_color(tabBtns, UI_COL_ACCENT, LV_PART_ITEMS | LV_STATE_CHECKED);
 
     struct TabDef {
         const char *name;
         void (*build)(lv_obj_t *);
     };
-    const TabDef tabs[] = {{"I/O", ui_io_tab}, {"ADC", ui_adc_tab}, {"จอ", ui_display_tab}, {"สัมผัส", ui_touch_tab}, {"RGB", ui_led_tab}, {"เสียง", ui_sound_tab}, {"ระบบ", ui_system_tab}};
+    const TabDef tabs[] = {{"ฟาร์ม", ui_farm_tab}, {"กฎ", ui_rules_tab}, {"เซนเซอร์", ui_adc_tab}, {"ระบบ", ui_system_tab}};
     for (const TabDef &t : tabs) {
         lv_obj_t *page = lv_tabview_add_tab(gTabview, t.name);
+        lv_obj_set_style_bg_color(page, UI_COL_BG, 0);
+        lv_obj_set_style_bg_opa(page, LV_OPA_COVER, 0);
         lv_obj_set_style_pad_all(page, 6, 0);
         lv_obj_set_style_pad_row(page, 6, 0);
         lv_obj_set_flex_flow(page, LV_FLEX_FLOW_COLUMN);
@@ -75,9 +100,12 @@ lv_obj_t *ui_card(lv_obj_t *parent, const char *title)
     lv_obj_set_size(card, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_style_pad_all(card, 8, 0);
     lv_obj_set_style_pad_row(card, 6, 0);
+    lv_obj_set_style_bg_color(card, UI_COL_CARD, 0);
+    lv_obj_set_style_border_color(card, UI_COL_BORDER, 0);
+    lv_obj_set_style_radius(card, 10, 0);
     lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
     lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLLABLE);
-    if (title != nullptr) ui_label(card, title, nullptr, lv_palette_main(LV_PALETTE_CYAN));
+    if (title != nullptr) ui_label(card, title, nullptr, UI_COL_ACCENT);
     return card;
 }
 
@@ -185,4 +213,51 @@ void ui_no_scroll(lv_obj_t *obj)
 {
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE);
+}
+
+void ui_ripple(lv_obj_t *parent)
+{
+    lv_obj_t *r = lv_obj_create(parent);
+    lv_obj_remove_style_all(r);
+    lv_obj_add_flag(r, LV_OBJ_FLAG_FLOATING);
+    lv_obj_clear_flag(r, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(r, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(r, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(r, 150, 0);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, r);
+    lv_anim_set_exec_cb(&a, rippleExec);
+    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_time(&a, 420);
+    lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
+    lv_anim_set_ready_cb(&a, lv_obj_del_anim_ready_cb);
+    lv_anim_start(&a);
+}
+
+lv_obj_t *ui_section(lv_obj_t *parent)
+{
+    lv_obj_t *c = lv_obj_create(parent);
+    lv_obj_remove_style_all(c);
+    lv_obj_set_size(c, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(c, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(c, 6, 0);
+    lv_obj_clear_flag(c, LV_OBJ_FLAG_SCROLLABLE);
+    return c;
+}
+
+void ui_view_show(lv_obj_t *show, lv_obj_t *hide, int dir)
+{
+    if (hide != nullptr) lv_obj_add_flag(hide, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(show, LV_OBJ_FLAG_HIDDEN);
+    gSlideDir = dir;
+    lv_anim_del(show, viewExec);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, show);
+    lv_anim_set_exec_cb(&a, viewExec);
+    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_time(&a, 280);
+    lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
+    lv_anim_start(&a);
 }
