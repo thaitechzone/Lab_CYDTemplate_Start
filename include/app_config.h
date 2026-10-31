@@ -35,6 +35,12 @@ constexpr float CAL_MAX_FIT_ERROR_PX = 6.0f;  // ความคลาดเค�
 constexpr float CAL_MAX_VERIFY_PX = 7.0f;     // ความคลาดเคลื่อนสูงสุดของจุดตรวจสอบ (จุดที่ไม่ได้ใช้คำนวณ)
 constexpr uint32_t CAL_CANCEL_MS = 20000;     // calibrate ซ้ำ (มีค่าเดิมอยู่) แล้วไม่แตะนานเกินนี้ = ยกเลิก ใช้ค่าเดิม
 
+// ---- PCF8574 ----
+constexpr uint32_t I2C_FREQ_HZ = 400000;
+constexpr uint32_t IO_POLL_MS = 15;         // อ่านสวิตช์ทุกกี่ ms
+constexpr uint8_t IO_DEBOUNCE_SAMPLES = 2;  // ค่าต้องนิ่งกี่ครั้งติดกันจึงนับว่าสวิตช์เปลี่ยน
+constexpr uint32_t IO_RETRY_MS = 1000;      // ชิปหาย: ลองต่อใหม่ทุกกี่ ms
+
 // ---- ไฟหลังจอ (PWM ที่ GPIO21) ----
 constexpr uint32_t BL_PWM_FREQ_HZ = 5000;
 constexpr uint8_t BL_PWM_BITS = 8;

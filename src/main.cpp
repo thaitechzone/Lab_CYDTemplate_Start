@@ -122,7 +122,8 @@ void printHelp()
                      " c  calibrate touch k  show calibration\n"
                      " d  display config  r  reset display config (also: hold BOOT 1 s)\n"
                      " t  toggle raw touch print\n"
-                     " l  LED test R,G,B,W   s  sound test"));
+                     " l  LED test R,G,B,W   s  sound test\n"
+                     " p  PCF8574 status"));
 }
 
 void serialCommands()
@@ -162,6 +163,10 @@ void serialCommands()
                 }
                 break;
             }
+            case 'p':
+                Serial.printf("[PCF] 0x%02X %s pins=0x%02X leds=0x%X switches=0x%X\n", cyd::PCF8574_ADDR, hal::ioPresent() ? "present" : "MISSING", hal::ioRaw(),
+                              hal::ioLeds(), hal::ioSwitches());
+                break;
             case 's': hal::soundPlay(hal::Melody::Scale); Serial.println("[SOUND] scale C5-C6"); break;
             default: break;
         }
@@ -199,6 +204,7 @@ void setup()
     hal::soundBegin();
     hal::displayBegin();  // จอ + ค่าแก้จอที่บันทึกไว้ + ไฟหลังจอ
     hal::touchBegin();    // โหลดค่า calibrate (ถ้ายังไม่มี หน้า calibrate จะขึ้นเองหลัง splash)
+    hal::ioBegin();       // PCF8574 ที่ I2C (SDA 27 / SCL 22)
 
     lvglBegin();
     ui_init();

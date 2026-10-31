@@ -69,6 +69,17 @@ void ledBegin();
 void ledSetRgb(uint8_t r, uint8_t g, uint8_t b);
 void ledGetRgb(uint8_t &r, uint8_t &g, uint8_t &b);
 
+// ---- PCF8574 I/O expander (hal_pcf8574.cpp) P0-P3 = LED (Isink), P4-P7 = สวิตช์ (Active Low) ----
+// บิต 0-3 ของ LED / สวิตช์ เป็นตรรกะ: LED 1 = ติด, สวิตช์ 1 = กด (โค้ดกลับขั้วให้แล้ว)
+bool ioBegin();               // เริ่ม I2C + เขียนค่าเริ่มต้น (true = เจอชิป)
+void ioPoll(uint32_t now);    // อ่านสวิตช์ + debounce + ลองต่อใหม่ถ้าชิปหาย (เรียกซ้ำได้ ถี่เกินไปจะข้ามเอง)
+bool ioPresent();
+void ioSetLeds(uint8_t mask);
+uint8_t ioLeds();
+void ioToggleLed(int index);
+uint8_t ioSwitches();         // บิต 0-3 = SW0-SW3 (P4-P7)
+uint8_t ioRaw();              // ระดับขาจริง P7..P0 ที่อ่านล่าสุด
+
 // ---- เซนเซอร์แสง ----
 int ldrRaw();  // 0-4095 (ยิ่งสว่างยิ่งต่ำ)
 
